@@ -42,24 +42,21 @@ function draw() {
   if (hands.length > 0) {
     for (let hand of hands) {
       if (hand.confidence > 0.1) {
+        // Determine the color based on handedness
+        let pointColor = hand.handedness == "Left" ? [255, 0, 255] : [255, 255, 0];
+
         // Loop through keypoints and draw circles
         for (let i = 0; i < hand.keypoints.length; i++) {
           let keypoint = hand.keypoints[i];
 
-          // Color-code based on left or right hand
-          if (hand.handedness == "Left") {
-            fill(255, 0, 255);
-          } else {
-            fill(255, 255, 0);
-          }
-
+          fill(...pointColor);
           noStroke();
           // Adjust keypoint positions relative to the centered video
           circle(keypoint.x + x, keypoint.y + y, 16);
         }
 
-        // Draw lines connecting points 0 to 4
-        stroke(0); // Set line color to black
+        // Draw lines connecting points 0 to 4 with the same color as the points
+        stroke(...pointColor); // Set line color to match the points
         strokeWeight(2); // Set line thickness
         for (let i = 0; i < 4; i++) {
           let start = hand.keypoints[i];

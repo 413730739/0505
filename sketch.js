@@ -47,8 +47,8 @@ function draw() {
   // Draw the video at the calculated position
   image(video, x, y);
 
-  // Draw the circle
-  fill(200, 200, 255);
+  // Draw the circle with 60% transparency
+  fill(200, 200, 255, 153); // 153 is 60% of 255 for alpha
   noStroke();
   ellipse(circleX, circleY, circleRadius * 2);
 
@@ -76,14 +76,23 @@ function draw() {
           circle(keypoint.x + x, keypoint.y + y, 16);
         }
 
-        // Draw lines connecting points 2, 5, 9, 13, 17
-        const specialPoints = [2, 5, 9, 13, 17];
+        // Draw lines connecting points 0~4, 5~8, 9~12, 13~16, 17~20
+        const ranges = [
+          [0, 4],  // Thumb
+          [5, 8],  // Index finger
+          [9, 12], // Middle finger
+          [13, 16], // Ring finger
+          [17, 20]  // Pinky finger
+        ];
+
         stroke(...pointColor); // Set line color to match the points
         strokeWeight(2); // Set line thickness
-        for (let i = 0; i < specialPoints.length - 1; i++) {
-          let start = hand.keypoints[specialPoints[i]];
-          let end = hand.keypoints[specialPoints[i + 1]];
-          line(start.x + x, start.y + y, end.x + x, end.y + y);
+        for (let [startIdx, endIdx] of ranges) {
+          for (let i = startIdx; i < endIdx; i++) {
+            let start = hand.keypoints[i];
+            let end = hand.keypoints[i + 1];
+            line(start.x + x, start.y + y, end.x + x, end.y + y);
+          }
         }
 
         // Get the keypoints for the index finger (8) and thumb (4)

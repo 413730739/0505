@@ -3,7 +3,10 @@
 
 let video;
 let handPose;
+let faceApi;
 let hands = [];
+let detections = []; // 儲存人臉辨識結果
+let earImage; // 儲存耳朵圖片
 let circleX, circleY; // 圓的初始位置
 let circleRadius = 50; // 圓的半徑
 let isDragging = false; // 是否正在拖動圓
@@ -13,14 +16,29 @@ let trails = []; // 儲存軌跡的陣列
 function preload() {
   // Initialize HandPose model with flipped video input
   handPose = ml5.handPose({ flipped: true });
+
+  // Load the ear image
+  earImage = loadImage('ear.png');
+
+  // Initialize FaceApi model
+  const faceOptions = { withLandmarks: true, withDescriptors: false };
+  faceApi = ml5.faceApi(faceOptions, modelReady);
 }
 
-function mousePressed() {
-  console.log(hands);
+function modelReady() {
+  console.log('FaceApi model loaded!');
 }
 
 function gotHands(results) {
   hands = results;
+}
+
+function gotFaces(error, result) {
+  if (error) {
+    console.error(error);
+    return;
+  }
+  detections = result;
 }
 
 function setup() {
@@ -34,6 +52,9 @@ function setup() {
 
   // Start detecting hands
   handPose.detectStart(video, gotHands);
+
+  // Start detecting faces
+  faceApi.detect(video, gotFaces);
 }
 
 function draw() {
@@ -57,6 +78,21 @@ function draw() {
     stroke(trail.color);
     strokeWeight(2);
     line(trail.x1, trail.y1, trail.x2, trail.y2);
+  }
+
+  // Draw ear image on detected ears
+  if (detections.length > 0) {
+    for (let detection of detections) {
+      const landmarks = detection.parts;
+      const leftEar = landmarks.leftEar[0]; // 左耳座標
+      const rightEar = landmarks.rightEar[0]; // 右耳座標
+
+      // Draw ear image at left ear position
+      image(earImage, leftEar._x + x, leftEar._y + y, 50, 50);
+
+      // Draw ear image at right ear position
+      image(earImage, rightEar._x + x, rightEar._y + y, 50, 50);
+    }
   }
 
   // Ensure at least one hand is detected
@@ -161,4 +197,7 @@ function draw() {
   if (!isDragging) {
     dragColor = null;
   }
+
+  // Continuously detect faces
+  faceApi.detect(video, gotFaces);
 }

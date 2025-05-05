@@ -3,9 +3,9 @@
 
 let video;
 let handPose;
-let faceApi;
+let faceMesh;
 let hands = [];
-let detections = []; // 儲存人臉辨識結果
+let faces = [];
 let earImage; // 儲存耳朵圖片
 let circleX, circleY; // 圓的初始位置
 let circleRadius = 50; // 圓的半徑
@@ -17,28 +17,23 @@ function preload() {
   // Initialize HandPose model with flipped video input
   handPose = ml5.handPose({ flipped: true });
 
+  // Initialize FaceMesh model with a maximum of one face and flipped video input
+  faceMesh = ml5.faceMesh({ maxFaces: 1, flipped: true });
+
   // Load the ear image
   earImage = loadImage('ear.png');
-
-  // Initialize FaceApi model
-  const faceOptions = { withLandmarks: true, withDescriptors: false };
-  faceApi = ml5.faceApi(faceOptions, modelReady);
 }
 
-function modelReady() {
-  console.log('FaceApi model loaded!');
+function mousePressed() {
+  console.log(hands);
 }
 
 function gotHands(results) {
   hands = results;
 }
 
-function gotFaces(error, result) {
-  if (error) {
-    console.error(error);
-    return;
-  }
-  detections = result;
+function gotFaces(results) {
+  faces = results;
 }
 
 function setup() {
@@ -54,7 +49,7 @@ function setup() {
   handPose.detectStart(video, gotHands);
 
   // Start detecting faces
-  faceApi.detect(video, gotFaces);
+  faceMesh.detectStart(video, gotFaces);
 }
 
 function draw() {
@@ -80,19 +75,19 @@ function draw() {
     line(trail.x1, trail.y1, trail.x2, trail.y2);
   }
 
-  // Draw ear image on detected ears
-  if (detections.length > 0) {
-    for (let detection of detections) {
-      const landmarks = detection.parts;
-      const leftEar = landmarks.leftEar[0]; // 左耳座標
-      const rightEar = landmarks.rightEar[0]; // 右耳座標
+  // Ensure at least one face is detected
+  if (faces.length > 0) {
+    let face = faces[0];
 
-      // Draw ear image at left ear position
-      image(earImage, leftEar._x + x, leftEar._y + y, 50, 50);
+    // Draw ear images at the detected ear positions
+    const leftEar = face.scaledMesh[234]; // 左耳的特徵點
+    const rightEar = face.scaledMesh[454]; // 右耳的特徵點
 
-      // Draw ear image at right ear position
-      image(earImage, rightEar._x + x, rightEar._y + y, 50, 50);
-    }
+    // Draw ear image at left ear position
+    image(earImage, leftEar[0] - 25, leftEar[1] - 25, 50, 50);
+
+    // Draw ear image at right ear position
+    image(earImage, rightEar[0] - 25, rightEar[1] - 25, 50, 50);
   }
 
   // Ensure at least one hand is detected
@@ -199,5 +194,5 @@ function draw() {
   }
 
   // Continuously detect faces
-  faceApi.detect(video, gotFaces);
+  faceMesh.detect(video, gotFaces);
 }

@@ -76,33 +76,8 @@ function draw() {
           circle(keypoint.x + x, keypoint.y + y, 16);
         }
 
-        // Draw lines connecting points 0 to 4
-        stroke(...pointColor); // Set line color to match the points
-        strokeWeight(2); // Set line thickness
-        for (let i = 0; i < 4; i++) {
-          let start = hand.keypoints[i];
-          let end = hand.keypoints[i + 1];
-          line(start.x + x, start.y + y, end.x + x, end.y + y);
-        }
-
-        // Draw lines connecting points 5~8, 9~12, 13~16, 17~20
-        const ranges = [
-          [5, 8],  // Index finger
-          [9, 12], // Middle finger
-          [13, 16], // Ring finger
-          [17, 20]  // Pinky finger
-        ];
-
-        for (let [startIdx, endIdx] of ranges) {
-          for (let i = startIdx; i < endIdx; i++) {
-            let start = hand.keypoints[i];
-            let end = hand.keypoints[i + 1];
-            line(start.x + x, start.y + y, end.x + x, end.y + y);
-          }
-        }
-
-        // Draw lines connecting points 3, 8, 12, 16, 20
-        const specialPoints = [3, 8, 12, 16, 20];
+        // Draw lines connecting points 2, 5, 9, 13, 17
+        const specialPoints = [2, 5, 9, 13, 17];
         stroke(...pointColor); // Set line color to match the points
         strokeWeight(2); // Set line thickness
         for (let i = 0; i < specialPoints.length - 1; i++) {

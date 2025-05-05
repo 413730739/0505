@@ -3,10 +3,7 @@
 
 let video;
 let handPose;
-let faceMesh;
 let hands = [];
-let faces = [];
-let earImage; // 儲存耳朵圖片
 let circleX, circleY; // 圓的初始位置
 let circleRadius = 50; // 圓的半徑
 let isDragging = false; // 是否正在拖動圓
@@ -16,12 +13,6 @@ let trails = []; // 儲存軌跡的陣列
 function preload() {
   // Initialize HandPose model with flipped video input
   handPose = ml5.handPose({ flipped: true });
-
-  // Initialize FaceMesh model with a maximum of one face and flipped video input
-  faceMesh = ml5.faceMesh({ maxFaces: 1, flipped: true });
-
-  // Load the ear image
-  earImage = loadImage('ear.png');
 }
 
 function mousePressed() {
@@ -30,10 +21,6 @@ function mousePressed() {
 
 function gotHands(results) {
   hands = results;
-}
-
-function gotFaces(results) {
-  faces = results;
 }
 
 function setup() {
@@ -47,9 +34,6 @@ function setup() {
 
   // Start detecting hands
   handPose.detectStart(video, gotHands);
-
-  // Start detecting faces
-  faceMesh.detectStart(video, gotFaces);
 }
 
 function draw() {
@@ -73,21 +57,6 @@ function draw() {
     stroke(trail.color);
     strokeWeight(2);
     line(trail.x1, trail.y1, trail.x2, trail.y2);
-  }
-
-  // Ensure at least one face is detected
-  if (faces.length > 0) {
-    let face = faces[0];
-
-    // Draw ear images at the detected ear positions
-    const leftEar = face.scaledMesh[234]; // 左耳的特徵點
-    const rightEar = face.scaledMesh[454]; // 右耳的特徵點
-
-    // Draw ear image at left ear position
-    image(earImage, leftEar[0] - 25, leftEar[1] - 25, 50, 50);
-
-    // Draw ear image at right ear position
-    image(earImage, rightEar[0] - 25, rightEar[1] - 25, 50, 50);
   }
 
   // Ensure at least one hand is detected
@@ -192,7 +161,4 @@ function draw() {
   if (!isDragging) {
     dragColor = null;
   }
-
-  // Continuously detect faces
-  faceMesh.detect(video, gotFaces);
 }

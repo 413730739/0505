@@ -28,7 +28,15 @@ function setup() {
 }
 
 function draw() {
-  image(video, 0, 0);
+  // Set canvas background to light pink
+  background(255, 182, 193);
+
+  // Calculate position to center the video
+  let x = (width - video.width) / 2;
+  let y = (height - video.height) / 2;
+
+  // Draw the video at the calculated position
+  image(video, x, y);
 
   // Ensure at least one hand is detected
   if (hands.length > 0) {
@@ -46,7 +54,17 @@ function draw() {
           }
 
           noStroke();
-          circle(keypoint.x, keypoint.y, 16);
+          // Adjust keypoint positions relative to the centered video
+          circle(keypoint.x + x, keypoint.y + y, 16);
+        }
+
+        // Draw lines connecting points 0 to 4
+        stroke(0); // Set line color to black
+        strokeWeight(2); // Set line thickness
+        for (let i = 0; i < 4; i++) {
+          let start = hand.keypoints[i];
+          let end = hand.keypoints[i + 1];
+          line(start.x + x, start.y + y, end.x + x, end.y + y);
         }
       }
     }

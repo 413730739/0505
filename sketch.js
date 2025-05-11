@@ -51,13 +51,13 @@ function setup() {
 
   // Create a button to toggle face detection
   toggleButton = createButton('啟用臉部偵測');
-  toggleButton.position((width - toggleButton.width) / 2-50, 250); // 放置在影像上方 50px
+  toggleButton.position((width - toggleButton.width) / 2-50, 150); // 放置在影像上方 50px
   toggleButton.style('background-color', '#ADD8E6'); // 設置按鈕背景顏色為淡藍色
   toggleButton.style('border', 'none'); // 移除邊框
   toggleButton.style('padding', '20px 30px'); // 增加按鈕內邊距
   toggleButton.style('border-radius', '5px'); // 圓角按鈕
   toggleButton.style('color', '#000'); // 按鈕文字顏色
-  toggleButton.style('font-size', '25px'); // 按鈕文字大小
+  toggleButton.style('font-size', '20px'); // 按鈕文字大小
   toggleButton.mousePressed(toggleFaceDetection);
 }
 

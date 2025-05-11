@@ -51,7 +51,13 @@ function setup() {
 
   // Create a button to toggle face detection
   toggleButton = createButton('啟用臉部偵測');
-  toggleButton.position(10, 10);
+  toggleButton.position((width - toggleButton.width) / 2-50, 250); // 放置在影像上方 50px
+  toggleButton.style('background-color', '#ADD8E6'); // 設置按鈕背景顏色為淡藍色
+  toggleButton.style('border', 'none'); // 移除邊框
+  toggleButton.style('padding', '20px 30px'); // 增加按鈕內邊距
+  toggleButton.style('border-radius', '5px'); // 圓角按鈕
+  toggleButton.style('color', '#000'); // 按鈕文字顏色
+  toggleButton.style('font-size', '25px'); // 按鈕文字大小
   toggleButton.mousePressed(toggleFaceDetection);
 }
 
@@ -87,9 +93,39 @@ function draw() {
     if (faces.length > 0) {
       let face = faces[0];
 
+      // 確保 scaledMesh 存在
+      if (face.scaledMesh) {
+        // 左耳和右耳的特徵點索引
+        const leftEarIndex = 234; // 左耳
+        const rightEarIndex = 454; // 右耳
+
+        // 獲取左耳和右耳的座標
+        const leftEar = face.scaledMesh[leftEarIndex];
+        const rightEar = face.scaledMesh[rightEarIndex];
+
+        // 確保特徵點存在並繪製耳朵圖片
+        if (leftEar) {
+          push();
+          translate(leftEar[0] + x, leftEar[1] + y); // 以左耳位置為原點
+          imageMode(CENTER); // 圖片以中心點為座標點
+          scale(0.1); // 縮小圖片到 0.1 倍
+          image(earImage, 0, 0); // 顯示左耳圖片
+          pop();
+        }
+        if (rightEar) {
+          push();
+          translate(rightEar[0] + x, rightEar[1] + y); // 以右耳位置為原點
+          imageMode(CENTER); // 圖片以中心點為座標點
+          scale(-0.1, 0.1); // 縮小圖片並左右翻轉
+          image(earImage, 0, 0); // 顯示右耳圖片
+          pop();
+        }
+      }
+
       // Draw keypoints on the detected face
       for (let i = 0; i < face.keypoints.length; i++) {
         let keypoint = face.keypoints[i];
+        
         stroke(255, 255, 0);
         strokeWeight(4);
 
@@ -101,7 +137,7 @@ function draw() {
     return; // 跳過手部偵測和繪畫邏輯
   }
 
-  // Draw the circle with 60% transparency
+  //畫圓
   fill(200, 200, 255, 153); // 153 is 60% of 255 for alpha
   noStroke();
   ellipse(circleX, circleY, circleRadius * 2);
